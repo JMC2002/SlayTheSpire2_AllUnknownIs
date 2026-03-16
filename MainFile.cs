@@ -1,11 +1,10 @@
-﻿using BetterMap.Core;
+﻿using AllUnknownIs.Core;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Modding;
-using System;
 using System.Reflection;
 
-namespace BetterMap;
+namespace AllUnknownIs;
 
 [ModInitializer(nameof(Initialize))]
 public partial class MainFile : Node

@@ -1,7 +1,4 @@
-﻿using System;
-using Godot;
-
-namespace BetterMap.Core;
+﻿namespace AllUnknownIs.Core;
 
 /// <summary>
 /// 封装日志打印，自动附带时间戳 [HH:mm:ss]
