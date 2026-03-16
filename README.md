@@ -2,13 +2,13 @@
 
 [📝更新日志](CHANGELOG.md)
 
-[📦 Releases](https://github.com/JMC2002/SlayTheSpire2-BetterMap/releases)
+[📦 Releases](https://github.com/JMC2002/SlayTheSpire2_AllUnknownIs/releases)
 
 # 所有问号房间全变为商店
 ##  0. 安装
 Steam版本直接在创意工坊订阅即可（暂未开放）
 
-其他版本可以自行编译，或者在[📦 Releases](https://github.com/JMC2002/SlayTheSpire2-BetterMap/releases)界面下载BetterModManager.zip后解压到游戏安装目录下的Mods
+其他版本可以自行编译，或者在[📦 Releases](https://github.com/JMC2002/SlayTheSpire2_AllUnknownIs/releases)界面下载.zip后解压到游戏安装目录下的Mods
 目录下（没有就新建一个）
 
 ```sh
@@ -29,7 +29,7 @@ Steam版本直接在创意工坊订阅即可（暂未开放）
 
 [演示视频（B站）](https://www.bilibili.com/video/BV14ScUzTEo2)
 
-[Github仓库](https://github.com/JMC2002/SlayTheSpire2-BetterMap)
+[Github仓库](https://github.com/JMC2002/SlayTheSpire2_AllUnknownIs)
 ## ⚙️ 2. 功能
 - 如上所述
  
