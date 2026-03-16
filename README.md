@@ -4,7 +4,7 @@
 
 [📦 Releases](https://github.com/JMC2002/SlayTheSpire2-BetterMap/releases)
 
-# 更好的地图
+# 所有问号房间全变为商店
 ##  0. 安装
 Steam版本直接在创意工坊订阅即可（暂未开放）
 
@@ -15,16 +15,17 @@ Steam版本直接在创意工坊订阅即可（暂未开放）
 -- Slay the Spire 2
     |-- SlayTheSpire2.exe
         |-- mods
-             |-- BetterMap
-                  |-- BetterMap.dll
-                  |-- BetterMap.pck
+             |-- AllUnknownIs
+                  |-- AllUnknownIs.dll
+                  |-- AllUnknownIs.pck
+                  |-- AllUnknownIs.json
 ```
 
 然后打开游戏一次后，将`%appdata%\SlayTheSpire2\steam\`下面的数字文件夹下的你对应的存档文件粘贴到该文件夹的`modded`文件夹中，以同步使用MOD前后的存档
 > ⚠️ release界面会随着创意工坊更新，最新版本以源代码为准，项目文件夹里的那个DLL也是最新的，但开发阶段不一定能用
 
 ## 🧠 1. 简介
-在地图界面的左侧放置一个小地图，用于显示整个地图的全览
+主要拿来出一期开局阳伞+所有问号全变商店的视频用的
 
 [演示视频（B站）](https://www.bilibili.com/video/BV14ScUzTEo2)
 
@@ -39,7 +40,6 @@ Steam版本直接在创意工坊订阅即可（暂未开放）
 - 由于游戏处于EA阶段，可能会随着游戏版本更新而失效
 
 ## 🧭 5. TODO
-- 增加设置功能（要我先写个前置）
-- 增加一些小功能
+- 增加设置功能（要我先写个前置）来手动调整所有问号变成的东西
 
 **如果你喜欢这个 Mod 的话，希望可以点一个star~**
