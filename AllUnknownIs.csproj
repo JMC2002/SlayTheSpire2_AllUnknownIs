@@ -17,13 +17,15 @@
     <Sts2DataDir>$(Sts2Path)\data_sts2_windows_x86_64</Sts2DataDir>
     <GodotExe>C:\Tools\Godot_v4.5.1-stable_mono_win64\Godot_v4.5.1-stable_mono_win64.exe</GodotExe>
 
+    <!-- 同名资源暂存文件夹 -->
     <ModLocalDir>$(ProjectDir)$(ModName)</ModLocalDir>
-    <!-- 资源文件夹定义 -->
-    <SrcDir>$(ProjectDir)\$(ModName)</SrcDir>
+
+    <!-- 定义发布文件夹路径 -->
     <PublishDir>$(ModLocalDir)\modPublish</PublishDir>
 
     <!-- 游戏最终加载的 mods 目录 -->
     <ModGameDir>$(Sts2Path)\mods\$(ModName)</ModGameDir>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,12 +40,12 @@
   </ItemGroup>
 
   <!-- ======================================================== -->
-  <!-- 自动化流水线 -->
+  <!-- 自动化流水线：构建 -> 暂存区组装 -> Godot 打包 -> 部署 -->
   <!-- ======================================================== -->
 
   <Target Name="EnsureGodotProjectFiles" BeforeTargets="BuildAndDeploy">
-    <Message Text="🔍 正在初始化发布环境..." Importance="High" />
-    <MakeDir Directories="$(SrcDir)" />
+    <Message Text="🔍 检查并补全暂存区 Godot 配置文件..." Importance="High" />
+    <!-- 确保暂存区文件夹存在 -->
     <MakeDir Directories="$(ModLocalDir)" />
     <MakeDir Directories="$(PublishDir)" />
 
@@ -55,7 +57,7 @@ config_version=5
 
 [application]
 config/name="$(ModName)"
-</ProjectGodotText>
+      </ProjectGodotText>
     </PropertyGroup>
     <WriteLinesToFile File="$(ModLocalDir)\project.godot" Lines="$(ProjectGodotText)" Overwrite="false" Encoding="ASCII" Condition="!Exists('$(ModLocalDir)\project.godot')" />
 
@@ -69,7 +71,7 @@ runnable=true
 dedicated_server=false
 custom_features=""
 export_filter="all_resources"
-include_filter="*.json, *.png, *.csv, *.jpg, *.txt"
+include_filter="*.json, *.png, *.csv"
 exclude_filter=""
 export_path=""
 encryption_include_filters=""
@@ -93,45 +95,39 @@ texture_format/etc2=false
     <!-- 3. 生成 mod_manifest.json -->
     <PropertyGroup Condition="!Exists('$(PublishDir)\$(ModName).json')">
       <ManifestText>
-        {
-        "pck_name": "$(ModName)",
-        "name": "$(ModName)",
-        "author": "$(Author)",
-        "version": "1.0.0",
-        "description": "$(ModName) Description"
-        }
+{
+    "pck_name": "$(ModName)",
+    "name": "$(ModName)",
+    "author": "$(Author)",
+    "version": "1.0.0",
+    "description": "$(ModName) Description"
+}
       </ManifestText>
     </PropertyGroup>
-    <WriteLinesToFile
-        File="$(PublishDir)\$(ModName).json"
-        Lines="$(ManifestText)"
-        Overwrite="false"
-        Encoding="utf-8"
-        Condition="!Exists('$(PublishDir)\$(ModName).json')" />
+    <WriteLinesToFile File="$(PublishDir)\$(ModName).json" Lines="$(ManifestText)" Overwrite="false" Encoding="utf-8" Condition="!Exists('$(PublishDir)\$(ModName).json')" />
   </Target>
 
+  <!-- 2. 构建与部署 -->
   <Target Name="BuildAndDeploy" AfterTargets="Build">
-    <!-- [1/4] 资源组装：从 src 同步到打包暂存区 -->
-    <Message Text="[1/4] 正在组装资源..." Importance="High" />
-    <ItemGroup>
-      <SrcFiles Include="$(SrcDir)\**\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(SrcFiles)" DestinationFolder="$(ModLocalDir)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <MakeDir Directories="$(PublishDir)" />
 
-    <!-- [2/4] 清单同步：将 Publish 中的主清单反向拷贝给 Godot 并改名 -->
-    <Message Text="[2/4] 同步主清单至打包环境..." Importance="High" />
-    <Copy 
-        SourceFiles="$(PublishDir)\$(ModName).json" 
-        DestinationFiles="$(ModLocalDir)\mod_manifest.json" 
+    <!-- [1/4] 准备打包环境：从发布目录拷贝清单回暂存目录并重命名 -->
+    <Message Text="[1/4] 准备 PCK 清单文件..." Importance="High" />
+    <Copy
+        SourceFiles="$(PublishDir)\$(ModName).json"
+        DestinationFiles="$(ModLocalDir)\mod_manifest.json"
         OverwriteReadOnlyFiles="true" />
 
-    <!-- [3/4] 拷贝 DLL 并执行打包 -->
+    <!-- [2/4] 复制 DLL 到发布区 -->
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PublishDir)" />
-    <Message Text="[3/4] 调用 Godot 打包 PCK..." Importance="High" />
+
+    <!-- [3/4] 调用 Godot 打包 PCK -->
+    <Message Text="[2/4] 调用 Godot 打包 PCK (工作目录: $(ModLocalDir))..." Importance="High" />
+    <!-- 此时 Godot 会在工作目录下找到重命名后的 mod_manifest.json -->
     <Exec Command="&quot;$(GodotExe)&quot; --headless --export-pack &quot;Windows Desktop&quot; &quot;modPublish\$(ModName).pck&quot;" WorkingDirectory="$(ModLocalDir)" StdOutEncoding="utf-8" StdErrEncoding="utf-8" EnvironmentVariables="NO_COLOR=1" Condition="Exists('$(GodotExe)') And Exists('$(ModLocalDir)\export_presets.cfg')" />
 
-    <!-- [4/4] 最终部署 -->
-    <Message Text="[4/4] 同步至游戏目录: $(ModGameDir)" Importance="High" />
+    <!-- 将发布内容同步到游戏目录 -->
+    <Message Text="[3/4] 同步所有文件到游戏目录..." Importance="High" />
     <MakeDir Directories="$(ModGameDir)" />
 
     <Exec Command="robocopy &quot;$(PublishDir)\.&quot; &quot;$(ModGameDir)\.&quot; /E /XO /R:2 /W:2" IgnoreExitCode="true" StandardOutputImportance="Low">
@@ -144,7 +140,7 @@ texture_format/etc2=false
          >3: 失败 -->
     <Error Condition="$(RoboExitCode) &gt; 3" Text="❌ Robocopy 同步失败（错误代码 $(RoboExitCode)）。请检查：1. 游戏是否已关闭；2. publish 文件夹内是否有文件。" />
 
-    <!-- 清理暂存区临时清单 -->
+    <!-- (可选) 清理暂存区的临时清单文件，保持整洁 -->
     <Delete Files="$(ModLocalDir)\mod_manifest.json" />
     
     <Message Text="✅ 构建完成！发布目录: $(PublishDir)" Importance="High" />
